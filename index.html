@@ -30,7 +30,15 @@
                     <label for="color5">Color 5: </label>
                     <input type="color" id="color5" value="#ff00ff">
                 </div>
+                  
+                <div id="coloroptions">
+                <button id="saveColorsBtn">Save Colors</button>
+                <button id="loadColorsBtn">Load Colors</button>
+                    </div>
+                <input type="file" id="loadColorsInput" style="display:none;">
             </div>
+            <hr>
+        
             <hr>
             <div class="size-options section">
                 <h2>Canvas Size</h2>
@@ -73,13 +81,13 @@
             </div>
             <hr>
             <div class="action-buttons">
-                <button id="downloadBtn">Download <span class="arrow-down">⬇️</span></button>
+                <button id="downloadBtn">Download</button>
             </div>
         </div>
         <div class="canvas-container">
             <canvas id="canvas"></canvas>
         </div>
+        <script src="script.js"></script>
     </div>
-    <script src="script.js"></script>
 </body>
 </html>

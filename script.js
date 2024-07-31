@@ -14,6 +14,9 @@ window.onload = function() {
     const sunriseBtn = document.getElementById('sunriseBtn');
     const moveBtn = document.getElementById('moveBtn');
     const downloadBtn = document.getElementById('downloadBtn');
+    const saveColorsBtn = document.getElementById('saveColorsBtn');
+    const loadColorsBtn = document.getElementById('loadColorsBtn');
+    const loadColorsInput = document.getElementById('loadColorsInput');
     const swooshThumbnail = document.getElementById('swooshThumbnail');
     const sunriseThumbnail = document.getElementById('sunriseThumbnail');
     const moveThumbnail = document.getElementById('moveThumbnail');
@@ -21,6 +24,9 @@ window.onload = function() {
     let currentComposition = 'swoosh';
     let gradientHistory = [];
     let currentGradientIndex = -1;
+    let isAnimating = false;
+    let stopPosition = 0;
+    let capturer = null;
 
     function setCanvasSize(width, height) {
         canvas.width = width;
@@ -169,10 +175,10 @@ window.onload = function() {
         if (composition === 'swoosh') {
             const upperGradient = ctx.createRadialGradient(0, canvas.height / 4, 0, 0, canvas.height / 4, canvas.width * 0.75);
             upperGradient.addColorStop(0.01, color1);
-            upperGradient.addColorStop(0.15, color2);
-            upperGradient.addColorStop(0.23, color3);
-            upperGradient.addColorStop(0.325, color4);
-            upperGradient.addColorStop(0.60, color5);
+            upperGradient.addColorStop(0.15 + stopPosition / 100, color2);
+            upperGradient.addColorStop(0.23 + stopPosition / 100, color3);
+            upperGradient.addColorStop(0.325 + stopPosition / 100, color4);
+            upperGradient.addColorStop(0.60 + stopPosition / 100, color5);
             upperGradient.addColorStop(1.0, color6);
 
             ctx.fillStyle = upperGradient;
@@ -180,10 +186,10 @@ window.onload = function() {
 
             const lowerGradient = ctx.createRadialGradient(canvas.width, canvas.height * 3 / 4, 0, canvas.width, canvas.height * 3 / 4, canvas.width * 0.75);
             lowerGradient.addColorStop(0.01, color1);
-            lowerGradient.addColorStop(0.15, color2);
-            lowerGradient.addColorStop(0.23, color3);
-            lowerGradient.addColorStop(0.325, color4);
-            lowerGradient.addColorStop(0.60, color5);
+            lowerGradient.addColorStop(0.15 + stopPosition / 100, color2);
+            lowerGradient.addColorStop(0.23 + stopPosition / 100, color3);
+            lowerGradient.addColorStop(0.325 + stopPosition / 100, color4);
+            lowerGradient.addColorStop(0.60 + stopPosition / 100, color5);
             lowerGradient.addColorStop(1.0, color6);
 
             ctx.fillStyle = lowerGradient;
@@ -191,10 +197,10 @@ window.onload = function() {
         } else if (composition === 'sunrise') {
             const upperGradient = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width * 0.75);
             upperGradient.addColorStop(0.01, color1);
-            upperGradient.addColorStop(0.15, color2);
-            upperGradient.addColorStop(0.23, color3);
-            upperGradient.addColorStop(0.325, color4);
-            upperGradient.addColorStop(0.60, color5);
+            upperGradient.addColorStop(0.15 + stopPosition / 100, color2);
+            upperGradient.addColorStop(0.23 + stopPosition / 100, color3);
+            upperGradient.addColorStop(0.325 + stopPosition / 100, color4);
+            upperGradient.addColorStop(0.60 + stopPosition / 100, color5);
             upperGradient.addColorStop(1.0, color6);
 
             ctx.fillStyle = upperGradient;
@@ -202,10 +208,10 @@ window.onload = function() {
 
             const lowerGradient = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width * 0.75);
             lowerGradient.addColorStop(0.01, color6);
-            lowerGradient.addColorStop(0.15, color5);
-            lowerGradient.addColorStop(0.23, color4);
-            lowerGradient.addColorStop(0.325, color3);
-            lowerGradient.addColorStop(0.60, color2);
+            lowerGradient.addColorStop(0.15 + stopPosition / 100, color5);
+            lowerGradient.addColorStop(0.23 + stopPosition / 100, color4);
+            lowerGradient.addColorStop(0.325 + stopPosition / 100, color3);
+            lowerGradient.addColorStop(0.60 + stopPosition / 100, color2);
             lowerGradient.addColorStop(1.0, color1);
 
             ctx.fillStyle = lowerGradient;
@@ -213,10 +219,10 @@ window.onload = function() {
         } else if (composition === 'move') {
             const upperGradient = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width * 0.75);
             upperGradient.addColorStop(0.01, color1);
-            upperGradient.addColorStop(0.15, color2);
-            upperGradient.addColorStop(0.23, color3);
-            upperGradient.addColorStop(0.325, color4);
-            upperGradient.addColorStop(0.60, color5);
+            upperGradient.addColorStop(0.15 + stopPosition / 100, color2);
+            upperGradient.addColorStop(0.23 + stopPosition / 100, color3);
+            upperGradient.addColorStop(0.325 + stopPosition / 100, color4);
+            upperGradient.addColorStop(0.60 + stopPosition / 100, color5);
             upperGradient.addColorStop(1.0, color6);
 
             ctx.fillStyle = upperGradient;
@@ -224,10 +230,10 @@ window.onload = function() {
 
             const lowerGradient = ctx.createRadialGradient(canvas.width / 2, canvas.height, 0, canvas.width / 2, canvas.height, canvas.width * 0.75);
             lowerGradient.addColorStop(0.01, color6);
-            lowerGradient.addColorStop(0.15, color5);
-            lowerGradient.addColorStop(0.23, color4);
-            lowerGradient.addColorStop(0.325, color3);
-            lowerGradient.addColorStop(0.60, color2);
+            lowerGradient.addColorStop(0.15 + stopPosition / 100, color5);
+            lowerGradient.addColorStop(0.23 + stopPosition / 100, color4);
+            lowerGradient.addColorStop(0.325 + stopPosition / 100, color3);
+            lowerGradient.addColorStop(0.60 + stopPosition / 100, color2);
             lowerGradient.addColorStop(1.0, color1);
 
             ctx.fillStyle = lowerGradient;
@@ -261,10 +267,10 @@ window.onload = function() {
         if (composition === 'swoosh') {
             const upperGradient = thumbnailCtx.createRadialGradient(0, thumbnailCanvas.height / 4, 0, 0, thumbnailCanvas.height / 4, thumbnailCanvas.width * 0.75);
             upperGradient.addColorStop(0.01, color1);
-            upperGradient.addColorStop(0.15, color2);
-            upperGradient.addColorStop(0.23, color3);
-            upperGradient.addColorStop(0.325, color4);
-            upperGradient.addColorStop(0.60, color5);
+            upperGradient.addColorStop(0.15 + stopPosition / 100, color2);
+            upperGradient.addColorStop(0.23 + stopPosition / 100, color3);
+            upperGradient.addColorStop(0.325 + stopPosition / 100, color4);
+            upperGradient.addColorStop(0.60 + stopPosition / 100, color5);
             upperGradient.addColorStop(1.0, color6);
 
             thumbnailCtx.fillStyle = upperGradient;
@@ -272,10 +278,10 @@ window.onload = function() {
 
             const lowerGradient = thumbnailCtx.createRadialGradient(thumbnailCanvas.width, thumbnailCanvas.height * 3 / 4, 0, thumbnailCanvas.width, thumbnailCanvas.height * 3 / 4, thumbnailCanvas.width * 0.75);
             lowerGradient.addColorStop(0.01, color1);
-            lowerGradient.addColorStop(0.15, color2);
-            lowerGradient.addColorStop(0.23, color3);
-            lowerGradient.addColorStop(0.325, color4);
-            lowerGradient.addColorStop(0.60, color5);
+            lowerGradient.addColorStop(0.15 + stopPosition / 100, color2);
+            lowerGradient.addColorStop(0.23 + stopPosition / 100, color3);
+            lowerGradient.addColorStop(0.325 + stopPosition / 100, color4);
+            lowerGradient.addColorStop(0.60 + stopPosition / 100, color5);
             lowerGradient.addColorStop(1.0, color6);
 
             thumbnailCtx.fillStyle = lowerGradient;
@@ -283,10 +289,10 @@ window.onload = function() {
         } else if (composition === 'sunrise') {
             const upperGradient = thumbnailCtx.createRadialGradient(thumbnailCanvas.width / 2, thumbnailCanvas.height / 2, 0, thumbnailCanvas.width / 2, thumbnailCanvas.height / 2, thumbnailCanvas.width * 0.75);
             upperGradient.addColorStop(0.01, color1);
-            upperGradient.addColorStop(0.15, color2);
-            upperGradient.addColorStop(0.23, color3);
-            upperGradient.addColorStop(0.325, color4);
-            upperGradient.addColorStop(0.60, color5);
+            upperGradient.addColorStop(0.15 + stopPosition / 100, color2);
+            upperGradient.addColorStop(0.23 + stopPosition / 100, color3);
+            upperGradient.addColorStop(0.325 + stopPosition / 100, color4);
+            upperGradient.addColorStop(0.60 + stopPosition / 100, color5);
             upperGradient.addColorStop(1.0, color6);
 
             thumbnailCtx.fillStyle = upperGradient;
@@ -294,10 +300,10 @@ window.onload = function() {
 
             const lowerGradient = thumbnailCtx.createRadialGradient(thumbnailCanvas.width / 2, thumbnailCanvas.height / 2, 0, thumbnailCanvas.width / 2, thumbnailCanvas.height / 2, thumbnailCanvas.width * 0.75);
             lowerGradient.addColorStop(0.01, color6);
-            lowerGradient.addColorStop(0.15, color5);
-            lowerGradient.addColorStop(0.23, color4);
-            lowerGradient.addColorStop(0.325, color3);
-            lowerGradient.addColorStop(0.60, color2);
+            lowerGradient.addColorStop(0.15 + stopPosition / 100, color5);
+            lowerGradient.addColorStop(0.23 + stopPosition / 100, color4);
+            lowerGradient.addColorStop(0.325 + stopPosition / 100, color3);
+            lowerGradient.addColorStop(0.60 + stopPosition / 100, color2);
             lowerGradient.addColorStop(1.0, color1);
 
             thumbnailCtx.fillStyle = lowerGradient;
@@ -305,10 +311,10 @@ window.onload = function() {
         } else if (composition === 'move') {
             const upperGradient = thumbnailCtx.createRadialGradient(thumbnailCanvas.width / 2, thumbnailCanvas.height / 2, 0, thumbnailCanvas.width / 2, thumbnailCanvas.height / 2, thumbnailCanvas.width * 0.75);
             upperGradient.addColorStop(0.01, color1);
-            upperGradient.addColorStop(0.15, color2);
-            upperGradient.addColorStop(0.23, color3);
-            upperGradient.addColorStop(0.325, color4);
-            upperGradient.addColorStop(0.60, color5);
+            upperGradient.addColorStop(0.15 + stopPosition / 100, color2);
+            upperGradient.addColorStop(0.23 + stopPosition / 100, color3);
+            upperGradient.addColorStop(0.325 + stopPosition / 100, color4);
+            upperGradient.addColorStop(0.60 + stopPosition / 100, color5);
             upperGradient.addColorStop(1.0, color6);
 
             thumbnailCtx.fillStyle = upperGradient;
@@ -316,10 +322,10 @@ window.onload = function() {
 
             const lowerGradient = thumbnailCtx.createRadialGradient(thumbnailCanvas.width / 2, thumbnailCanvas.height, 0, thumbnailCanvas.width / 2, thumbnailCanvas.height, thumbnailCanvas.width * 0.75);
             lowerGradient.addColorStop(0.01, color6);
-            lowerGradient.addColorStop(0.15, color5);
-            lowerGradient.addColorStop(0.23, color4);
-            lowerGradient.addColorStop(0.325, color3);
-            lowerGradient.addColorStop(0.60, color2);
+            lowerGradient.addColorStop(0.15 + stopPosition / 100, color5);
+            lowerGradient.addColorStop(0.23 + stopPosition / 100, color4);
+            lowerGradient.addColorStop(0.325 + stopPosition / 100, color3);
+            lowerGradient.addColorStop(0.60 + stopPosition / 100, color2);
             lowerGradient.addColorStop(1.0, color1);
 
             thumbnailCtx.fillStyle = lowerGradient;
@@ -329,22 +335,20 @@ window.onload = function() {
         thumbnailElement.style.backgroundImage = `url(${thumbnailCanvas.toDataURL()})`;
     }
 
-    function triggerRandomGenerate() {
-        saveCurrentColors();
-        const colors = generateRandomColors();
-        color1Picker.value = colors[0];
-        color2Picker.value = colors[1];
-        color3Picker.value = colors[2];
-        color5Picker.value = colors[3];
-        updateGradient();
-    }
-
     color1Picker.addEventListener('input', () => updateGradient());
     color2Picker.addEventListener('input', () => updateGradient());
     color3Picker.addEventListener('input', () => updateGradient());
     color5Picker.addEventListener('input', () => updateGradient());
 
-    randomBtn.addEventListener('click', triggerRandomGenerate);
+    randomBtn.addEventListener('click', () => {
+        const colors = generateRandomColors();
+        color1Picker.value = colors[0];
+        color2Picker.value = colors[1];
+        color3Picker.value = colors[2];
+        color5Picker.value = colors[3];
+        saveCurrentColors();
+        updateGradient();
+    });
 
     swooshBtn.addEventListener('click', () => {
         currentComposition = 'swoosh';
@@ -368,9 +372,50 @@ window.onload = function() {
         link.click();
     });
 
-    document.addEventListener('keydown', (event) => {
+    saveColorsBtn.addEventListener('click', function() {
+        const colors = {
+            color1: color1Picker.value,
+            color2: color2Picker.value,
+            color3: color3Picker.value,
+            color5: color5Picker.value
+        };
+        const colorsJSON = JSON.stringify(colors);
+        const blob = new Blob([colorsJSON], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'colors.json';
+        link.click();
+    });
+
+    loadColorsBtn.addEventListener('click', function() {
+        loadColorsInput.click();
+    });
+
+    loadColorsInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const colors = JSON.parse(e.target.result);
+                color1Picker.value = colors.color1;
+                color2Picker.value = colors.color2;
+                color3Picker.value = colors.color3;
+                color5Picker.value = colors.color5;
+                updateGradient();
+            };
+            reader.readAsText(file);
+        }
+    });
+
+    document.addEventListener('keydown', function(event) {
         if (event.code === 'Space') {
-            triggerRandomGenerate();
+            const colors = generateRandomColors();
+            color1Picker.value = colors[0];
+            color2Picker.value = colors[1];
+            color3Picker.value = colors[2];
+            color5Picker.value = colors[3];
+            saveCurrentColors();
+            updateGradient();
         } else if (event.code === 'ArrowLeft') {
             if (currentGradientIndex > 0) {
                 currentGradientIndex--;
