@@ -407,6 +407,39 @@ window.onload = function() {
         }
     });
 
+    document.addEventListener("DOMContentLoaded", () => {
+  const words = ["Oh", "Hi!", "This", "is", "Annes", "Portfolio!"];
+  const container = document.getElementById("window-container");
+
+  words.forEach((word, index) => {
+    const win = document.createElement("div");
+    win.classList.add("window");
+    win.innerText = word;
+
+    // Zufällige Position und Farbe
+    win.style.top = Math.random() * 70 + 10 + "%";
+    win.style.left = Math.random() * 70 + 10 + "%";
+    win.style.borderColor = getRandomColor();
+
+    win.addEventListener("click", () => {
+      document.querySelectorAll(".window").forEach(w => {
+        w.classList.add("fade-out");
+      });
+      setTimeout(() => {
+        document.getElementById("loading-screen").style.display = "none";
+      }, 600);
+    });
+
+    container.appendChild(win);
+  });
+});
+
+function getRandomColor() {
+  const colors = ["#e63946", "#f1c40f", "#2ecc71", "#3498db", "#9b59b6", "#e67e22"];
+  return colors[Math.floor(Math.random() * colors.length)];
+}
+
+
     document.addEventListener('keydown', function(event) {
         if (event.code === 'Space') {
             const colors = generateRandomColors();
